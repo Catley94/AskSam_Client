@@ -1,10 +1,10 @@
 interface QuestionObj {
-    Id: number,
-    Answered: boolean,
-    Question: string,
-    Answer: string,
-    DateCreated: string,
-    DateUpdated: string
+    id: number,
+    answered: boolean,
+    question: string,
+    answer: string,
+    dateCreated: string,
+    dateUpdated: string
 }
 
 export default QuestionObj;

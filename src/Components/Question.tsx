@@ -5,8 +5,8 @@ const Question: FC<QuestionObj> = (props): JSX.Element => {
   return (
     <>
         <li className="p-2 shadow-md rounded-xl">
-            <div>{props.Question}</div>
-            <div v-if="question.answer.length > 0" className="text-teal-500 font-semibold">{props.Answer}</div>
+            <div>{props.question}</div>
+            <div v-if="question.answer.length > 0" className="text-teal-500 font-semibold">{props.answer}</div>
         </li>
     </>
   )

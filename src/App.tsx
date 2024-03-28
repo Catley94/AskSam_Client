@@ -8,8 +8,8 @@ const App: FC = () => {
 
   const header: string = "Ask Sam";
   const questionList: QuestionObj[] = [
-      {Id: 0, Answered: true, Question: "What is my question?", Answer: "No idea!", DateCreated: "2024/03/28", DateUpdated: "2024/03/28"},
-      {Id: 1, Answered: false, Question: "Is this empty?", Answer: "", DateCreated: "2024/03/28", DateUpdated: ""},
+      {id: 0, answered: true, question: "What is my question?", answer: "No idea!", dateCreated: "2024/03/28", dateUpdated: "2024/03/28"},
+      {id: 1, answered: false, question: "Is this empty?", answer: "", dateCreated: "2024/03/28", dateUpdated: ""},
   ]
 
   const [questions, setQuestions] = useState<QuestionObj[]>();
@@ -17,6 +17,14 @@ const App: FC = () => {
 
   const submitHandler = () => {
     console.log("Submit my question");
+    const data = {
+      answered: false,
+      question: "Test Question?",
+      answer: "",
+      type: "General"
+    }
+    postData("http://localhost:5125/questions", data);
+
   }
 
   const deleteDatabaseHandler = () => {
@@ -29,9 +37,27 @@ const App: FC = () => {
   }
 
   const populateQuestions = async () => {
-    const response = await fetch('questions');
+    const response = await fetch('http://localhost:5125/questions');
     const data = await response.json();
+    if(data) console.log(data);
     setQuestions(data); //Returns an array of all forecasts
+  }
+
+  const   postData = async (url = "", data = {}) => {
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
   }
 
   useEffect(() => {
