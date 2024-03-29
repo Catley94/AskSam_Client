@@ -13,16 +13,18 @@ const App: FC = () => {
   ]
 
   const [questions, setQuestions] = useState<QuestionObj[]>();
+  const [currentQuestion, setCurrentQuestion] = useState<string | number | readonly string[] | undefined>("");
 
 
   const submitHandler = () => {
     console.log("Submit my question");
     const data = {
       answered: false,
-      question: "Test Question?",
+      question: currentQuestion,
       answer: "",
       type: "General"
     }
+    console.log("Sent to Server: ", data);
     postData("http://localhost:5125/questions", data);
 
   }
@@ -76,7 +78,12 @@ const App: FC = () => {
               
               <textarea v-model="question"
                   className=" bg-slate-50 rounded-xl shadow-md shadow-teal-200 p-3 w-full text-center focus:border-2 focus:border-teal-300 focus:outline-none"
-                  placeholder="What would you like to ask?"></textarea>
+                  placeholder="What would you like to ask?"
+                  value={currentQuestion}
+                  onChange={(event) => {
+                    setCurrentQuestion(event.target.value);
+                  }}
+                  ></textarea>
               <div className="flex place-content-center h-16 ">
                   <button 
                       className="w-32 h-16 rounded border-2 border-teal-200 transition ease-in-out hover:border-white hover:bg-teal-200 duration-300 px-7 focus:bg-teal-200"
