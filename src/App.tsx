@@ -28,7 +28,7 @@ const App: FC = () => {
     }
     postData("http://localhost:5125/questions", data)
       .then(() => {
-        populateQuestions();
+        populateQuestionsFromAPI();
         setCurrentQuestion("");
       });
   }
@@ -38,11 +38,11 @@ const App: FC = () => {
     console.log(questions);
   }
 
-  const populateQuestions = async () => {
+  const populateQuestionsFromAPI = async () => {
     const response = await fetch('http://localhost:5125/questions');
     const data = await response.json();
     if(data) console.log(data);
-    setQuestions(data); //Returns an array of all forecasts
+    setQuestions(data.reverse()); //Returns an array of all forecasts
   }
 
   const postData = async (url = "", data = {}) => {
@@ -63,13 +63,11 @@ const App: FC = () => {
   }
 
   const onHandleKeyDown = (event: { keyCode: number; }) => {
-    console.log(event);
     if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(true);
     if(shiftKeyHeldDown && event.keyCode === enterKeyCode) submitQuestion();
   }
 
   const onHandleKeyUp = (event: { keyCode: number; }) => {
-    console.log(event);
     if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(false); 
   }
 
@@ -77,7 +75,7 @@ const App: FC = () => {
 
     // setMockData();
 
-    populateQuestions();
+    populateQuestionsFromAPI();
 
   }, []);
 
