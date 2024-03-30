@@ -6,6 +6,11 @@ import QuestionObj from './Interface/QuestionObj';
 
 const App: FC = () => {
 
+  // Example array of numbers
+  const ids = [1, 2, 3, 4];
+  // Create a query string with all the ids
+  const queryString = ids.map(id => `ids=${id}`).join('&');
+
   const header: string = "Ask Sam";
   const questionList: QuestionObj[] = [
       {id: 0, answered: true, question: "What is my question?", answer: "No idea!", dateCreated: "2024/03/28", dateUpdated: "2024/03/28"},
@@ -26,10 +31,11 @@ const App: FC = () => {
       answer: "",
       type: "General"
     }
-    postData("http://localhost:5125/questions", data)
+    postDataToAPI("http://localhost:5125/questions", data)
       .then(() => {
         populateQuestionsFromAPI();
         setCurrentQuestion("");
+        //Set cookie with questionIDs
       });
   }
 
@@ -39,13 +45,20 @@ const App: FC = () => {
   }
 
   const populateQuestionsFromAPI = async () => {
-    const response = await fetch('http://localhost:5125/questions');
-    const data = await response.json();
-    if(data) console.log(data);
-    setQuestions(data.reverse()); //Returns an array of all forecasts
+    const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
+      method: "GET"
+    });
+    await response.json()
+      .then((_data) => {
+
+        if(_data) console.log(_data);
+        setQuestions(_data.reverse()); //Returns an array of all forecasts
+      })
+      .catch(error => console.error("Error: ", error));
+
   }
 
-  const postData = async (url = "", data = {}) => {
+  const postDataToAPI = async (url = "", data = {}) => {
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, *cors, same-origin
