@@ -2,14 +2,27 @@ import { FC, useEffect, useState } from 'react'
 import './App.css'
 import Question from './Components/Question';
 import QuestionObj from './Interface/QuestionObj';
+import Cookies from "js-cookie";
 // import QuestionObj from './Interface/QuestionObj';
 
 const App: FC = () => {
 
+  /*
+    TODO:
+      Using Question IDs isn't very safe, a user could alter the cookie, then see other questions.
+      Server should assign a unique ID when requesting for the first time.
+      ID should be stored in cookie.
+
+      When sending requests, send ID of client with it, 
+      Server can then search for any ID matching client IDs, to send back the list of questions.
+
+      Will need to post client ID with request.
+  */
+
   // Example array of numbers
-  const ids = [1, 2, 3, 4];
-  // Create a query string with all the ids
-  const queryString = ids.map(id => `ids=${id}`).join('&');
+  // const cookieQuestionIds: number[] = [];
+  const [cookieQuestionIds, setCookieQuestionIds] = useState<number[]>([]);
+  const cookieQuestionName = "questionIds";  
 
   const header: string = "Ask Sam";
   const questionList: QuestionObj[] = [
@@ -32,10 +45,15 @@ const App: FC = () => {
       type: "General"
     }
     postDataToAPI("http://localhost:5125/questions", data)
-      .then(() => {
+      .then((question) => {
         populateQuestionsFromAPI();
         setCurrentQuestion("");
-        //Set cookie with questionIDs
+        //Push ID to question cookie
+        setCookieQuestionIds(prevIds => {
+          const updatedIds = [...prevIds, question.id]
+          Cookies.set(cookieQuestionName, JSON.stringify(updatedIds))
+          return updatedIds;
+        });
       });
   }
 
@@ -45,6 +63,14 @@ const App: FC = () => {
   }
 
   const populateQuestionsFromAPI = async () => {
+    const cookie = Cookies.get(cookieQuestionName);
+    if(cookie) {
+
+      const parsedIds = JSON.parse(cookie);
+      setCookieQuestionIds(parsedIds);
+
+    }
+    const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
     const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
       method: "GET"
     });
@@ -84,13 +110,59 @@ const App: FC = () => {
     if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(false); 
   }
 
+  // useEffect(() => {
+
+  //   // setMockData();
+  //   const fetchQuestions = async () => {
+  //     if (cookieQuestionIds && cookieQuestionIds.length > 0) {
+  //       const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
+  //       const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
+  //         method: "GET"
+  //       });
+  //       const data = await response.json();
+  //       if (data) {
+  //         console.log(data);
+  //         setQuestions(data.reverse()); // Returns an array of all forecasts
+  //       }
+  //     }
+  //   };
+  //   fetchQuestions();
+
+  // }, []);
+
   useEffect(() => {
+    // Read the cookie on initial render
+    const cookie = Cookies.get(cookieQuestionName);
+    if (cookie) {
+      // Parse the cookie value and update the state
+      const parsedIds = JSON.parse(cookie);
+      setCookieQuestionIds(parsedIds);
+    }
+  }, []); // The empty array ensures this effect runs only on initial render
 
-    // setMockData();
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (cookieQuestionIds && cookieQuestionIds.length > 0) {
+        const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
+        if(queryString != "") {
+          const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
+            method: "GET"
+          });
+          const data = await response.json();
+          if (data) {
+            console.log(data);
+            setQuestions(data.reverse()); // Returns an array of all forecasts
+          }
+        }
+      }
+    };
+  
 
-    populateQuestionsFromAPI();
+    
+    fetchQuestions();
+  }, [cookieQuestionIds]);
 
-  }, []);
+  
 
   return (
     <>
