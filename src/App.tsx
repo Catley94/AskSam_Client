@@ -20,9 +20,8 @@ const App: FC = () => {
   */
 
   // Example array of numbers
-  // const cookieQuestionIds: number[] = [];
-  const [cookieQuestionIds, setCookieQuestionIds] = useState<number[]>([]);
-  const cookieQuestionName = "questionIds";  
+  // const cookieQuestionIds: number[] = [];  
+  const cookieClientId = "clientId";  
 
   const header: string = "Ask Sam";
   const questionList: QuestionObj[] = [
@@ -39,6 +38,7 @@ const App: FC = () => {
 
   const submitQuestion = () => {
     const data = {
+      guid: Cookies.get(cookieClientId),
       answered: false,
       question: currentQuestion,
       answer: "",
@@ -46,14 +46,10 @@ const App: FC = () => {
     }
     postDataToAPI("http://localhost:5125/questions", data)
       .then((question) => {
-        populateQuestionsFromAPI();
-        setCurrentQuestion("");
-        //Push ID to question cookie
-        setCookieQuestionIds(prevIds => {
-          const updatedIds = [...prevIds, question.id]
-          Cookies.set(cookieQuestionName, JSON.stringify(updatedIds))
-          return updatedIds;
-        });
+        console.log("%c Returned Post Obj: ", "background: orange; font-weight:bold;");
+        console.log(question);
+        populateQuestionsFromAPI(); //Populates the question list
+        setCurrentQuestion(""); //Resets TextArea to empty
       });
   }
 
@@ -62,26 +58,31 @@ const App: FC = () => {
     console.log(questions);
   }
 
-  const populateQuestionsFromAPI = async () => {
-    const cookie = Cookies.get(cookieQuestionName);
-    if(cookie) {
+  const fetchAllQuestions = async (): Promise<QuestionObj[]> => {
 
-      const parsedIds = JSON.parse(cookie);
-      setCookieQuestionIds(parsedIds);
+    let _questionList: QuestionObj[] = [];
 
-    }
-    const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
-    const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
+    const response = await fetch(`http://localhost:5125/questions/${Cookies.get(cookieClientId)}`, {
       method: "GET"
-    });
+    })
     await response.json()
-      .then((_data) => {
+    .then((_questions) => {
+      _questionList = _questions;
+    })
+    .catch((error) => {
+      console.error("Error fetching question list: ", error);
+    })
+    return _questionList;
+  }
 
-        if(_data) console.log(_data);
-        setQuestions(_data.reverse()); //Returns an array of all forecasts
+  const populateQuestionsFromAPI = async () => {
+
+    await fetchAllQuestions()
+      .then((questions) => {
+        console.log("%c Setting questions in list", "background: skyblue; font-weight: bold;");
+        console.log(questions);
+        setQuestions(questions);
       })
-      .catch(error => console.error("Error: ", error));
-
   }
 
   const postDataToAPI = async (url = "", data = {}) => {
@@ -131,36 +132,64 @@ const App: FC = () => {
   // }, []);
 
   useEffect(() => {
-    // Read the cookie on initial render
-    const cookie = Cookies.get(cookieQuestionName);
-    if (cookie) {
-      // Parse the cookie value and update the state
-      const parsedIds = JSON.parse(cookie);
-      setCookieQuestionIds(parsedIds);
+
+    const fetchUserId = async () => {
+      const response = await fetch(`http://localhost:5125/questions/getclientid`, {
+        method: "GET"
+      })
+      const data = await response.json();
+      if(data) {
+        console.log(data);
+        Cookies.set(cookieClientId, data);
+      }
     }
+
+    
+
+
+
+    const clientIdCookie = Cookies.get(cookieClientId);
+    if(!clientIdCookie) {
+      //Check for UUID instead of question numbers
+      fetchUserId();
+    }
+
+    populateQuestionsFromAPI();
+
+
+    // // Read the cookie on initial render
+    // const cookie = Cookies.get(cookieQuestionName);
+    // if (cookie) {
+    //   // Parse the cookie value and update the state
+    //   const parsedIds = JSON.parse(cookie);
+    //   setCookieQuestionIds(parsedIds);
+    // }
+    
+
+
   }, []); // The empty array ensures this effect runs only on initial render
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      if (cookieQuestionIds && cookieQuestionIds.length > 0) {
-        const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
-        if(queryString != "") {
-          const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
-            method: "GET"
-          });
-          const data = await response.json();
-          if (data) {
-            console.log(data);
-            setQuestions(data.reverse()); // Returns an array of all forecasts
-          }
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const fetchQuestions = async () => {
+  //     if (cookieQuestionIds && cookieQuestionIds.length > 0) {
+  //       const queryString = cookieQuestionIds.map(id => `ids=${id}`).join('&');
+  //       if(queryString != "") {
+  //         const response = await fetch(`http://localhost:5125/questions?${queryString}`, {
+  //           method: "GET"
+  //         });
+  //         const data = await response.json();
+  //         if (data) {
+  //           console.log(data);
+  //           setQuestions(data.reverse()); // Returns an array of all forecasts
+  //         }
+  //       }
+  //     }
+  //   };
   
 
     
-    fetchQuestions();
-  }, [cookieQuestionIds]);
+  //   fetchQuestions();
+  // }, [cookieQuestionIds]);
 
   
 
