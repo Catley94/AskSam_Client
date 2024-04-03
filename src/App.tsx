@@ -86,7 +86,7 @@ const App: FC = () => {
 
   const submitQuestion = (): void => {
     const data = {
-      guid: Cookies.get(cookieClientId),
+      clientGuid: Cookies.get(cookieClientId),
       answered: false,
       question: currentQuestion,
       answer: "",
