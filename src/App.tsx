@@ -35,6 +35,7 @@ const App: FC = () => {
   const [questions, setQuestions]: [QuestionObj[] | undefined, Dispatch<QuestionObj[] | undefined>] = useState<QuestionObj[]>();
   const [currentQuestion, setCurrentQuestion]: [string | number | readonly string[] | undefined, Dispatch<string | number | readonly string[] | undefined>] = useState<string | number | readonly string[] | undefined>("");
   const [shiftKeyHeldDown, setShiftKeyHeldDown]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
+  const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -63,14 +64,20 @@ const App: FC = () => {
 
     await fetchAllQuestions()
       .then((questions) => {
-        setQuestions(questions.reverse());
+        setQuestions(questions?.reverse());
+      })
+      .catch((error) => {
+        console.error(error);
       })
   }
 
-  const fetchAllQuestions = async (): Promise<QuestionObj[]> => {
+  const fetchAllQuestions = async (): Promise<QuestionObj[] | null> => {
 
     let _questionList: QuestionObj[] = [];
-
+    if(cookiesDeclined) {
+      console.error("Unable to POST question as cookies were declined, thus there is no unique id for this user.");
+      return null;
+    }
     const response = await fetch(`http://localhost:5125/questions/${Cookies.get(cookieClientId)}`, {
       method: "GET"
     })
@@ -126,6 +133,20 @@ const App: FC = () => {
     if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(false); 
   }
 
+  const onAcceptCookies = () => {
+    hideCookieMessage();
+    setCookiesDeclined(false);
+  }
+
+  const onDeclineCookies = () => {
+    hideCookieMessage();
+    setCookiesDeclined(true);
+    Cookies.remove(cookieClientId);
+  }
+
+  const hideCookieMessage = () => {
+    document.getElementById("cookieNotification")?.classList.add("hidden");
+  }
   
 
   
@@ -135,6 +156,16 @@ const App: FC = () => {
   return (
     <>
       <div id="askSamContainer" className="text-center py-12 bg-slate-200 text-slate-600">
+        <div className="flex justify-center">
+          <div id="cookieNotification" role="alert" className="alert w-1/2 absolute">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>We use cookies to keep track of your unique id which will be saved with each question you ask. If you choose not to accept cookies, you will be unable to see the questions you ask or receive answers and the application will not work as intended.</span>
+            <div>
+              <button className="btn btn-sm" onClick={onDeclineCookies}>Deny</button>
+              <button className="btn btn-sm btn-primary" onClick={onAcceptCookies}>Accept</button>
+            </div>
+          </div>
+        </div>
           <h1 className="text-4xl font-semibold ">{header}</h1>
           <div className="flex bg-white rounded-xl mx-auto m-6 shadow-md max-w-3xl">
               
