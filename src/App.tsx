@@ -152,7 +152,7 @@ const App: FC = () => {
     <>
       <div id="askSamContainer" className="text-center py-12 bg-slate-200 text-slate-600">
         <div className="flex justify-center">
-          <div id="cookieNotification" role="alert" className="alert w-1/2 absolute">
+          <div id="cookieNotification" role="alert" className="alert w-3/4 absolute lg:w-1/2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>We use cookies to keep track of your unique id which will be saved with each question you ask. If you choose not to accept cookies, you will be unable to see the questions you ask or receive answers and the application will not work as intended.</span>
             <div>
