@@ -12,18 +12,21 @@ const App: FC = () => {
     User loads the page
       React checks if there is a cookie with the same of "clientId"
         if no:
-          Sends GET request to /questions/getclientid which returns a random guid
-          Stores the guid in a cookie
-      React sends GET request to /questions/{clientid} which returns all the questions in the database with the clientId attached.
-      React populates question list.
+          Displays Cookie notification
+            If User accepts cookies:
+              Sends GET request to /questions/getclientid which returns a random guid
+              Stores the guid in a cookie
+              React sends GET request to /questions/{clientid} which returns all the questions in the database with the clientId attached.
+              React populates question list.
 
+            If User declines cookies:
+              Check if there is an existing cookie and delete,
+                otherwise, do nothing.
     User submits a question
       React sends POST request to server posting the data (guid, question, answered, answer).
       React sends GET request to /questions/{clientid} which returns all the questions in the database with the clientId attached.
       React populates question list.
   */
-
-  //TODO Add notifcation to allow cookies? (Cookies last 360 days)
 
   const cookieClientId: string = "clientId";  
 
@@ -38,27 +41,22 @@ const App: FC = () => {
   const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
-
-    const fetchUserId = async (): Promise<void> => {
-      const response = await fetch(`http://localhost:5125/questions/getclientid`, {
-        method: "GET"
-      })
-      const data = await response.json();
-      if(data) {
-        Cookies.set(cookieClientId, data, { expires: 360 });
-        populateQuestionsFromAPI();
-      }
-    }
-
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
-      //Check for UUID instead of question numbers
-      fetchUserId();
+      //Cookie does not exist
+      showCookieNotification(true);
     } else {
       populateQuestionsFromAPI();
     }
-
   }, []); // The empty array ensures this effect runs only on initial render
+
+  const showCookieNotification = (visible: boolean): void => {
+    const cookieNotification: HTMLElement | null = document.getElementById("cookieNotification");
+    if(cookieNotification) {
+      if(visible) cookieNotification.classList.contains("hidden") && cookieNotification.classList.remove("hidden");
+      if(!visible) !cookieNotification.classList.contains("hidden") && cookieNotification.classList.add("hidden");
+    }
+  }
 
   const populateQuestionsFromAPI = async (): Promise<void> => {
 
@@ -134,25 +132,37 @@ const App: FC = () => {
   }
 
   const onAcceptCookies = () => {
-    hideCookieMessage();
     setCookiesDeclined(false);
+    showCookieNotification(false);
+    fetchUserIdAndPopulateQuestions();
   }
 
   const onDeclineCookies = () => {
-    hideCookieMessage();
+    showCookieNotification(false);
     setCookiesDeclined(true);
-    Cookies.remove(cookieClientId);
+    if(Cookies.get(cookieClientId)) Cookies.remove(cookieClientId);
   }
 
-  const hideCookieMessage = () => {
-    document.getElementById("cookieNotification")?.classList.add("hidden");
+  const fetchUserIdAndPopulateQuestions = async (): Promise<void> => {
+    const response = await fetch(`http://localhost:5125/questions/getclientid`, {
+      method: "GET"
+    })
+    const data = await response.json();
+    if(data) {
+      createCookie(cookieClientId, data, 360);
+      populateQuestionsFromAPI();
+    }
   }
-  
+
+  const createCookie = (cookieName: string, data: string, days: number) => {
+    Cookies.set(cookieName, data, { expires: days });
+  }
+
   return (
     <>
       <div id="askSamContainer" className="text-center py-12 bg-slate-200 text-slate-600">
         <div className="flex justify-center">
-          <div id="cookieNotification" role="alert" className="alert w-3/4 absolute lg:w-1/2">
+          <div id="cookieNotification" role="alert" className="hidden alert w-3/4 absolute lg:w-1/2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>We use cookies to keep track of your unique id which will be saved with each question you ask. If you choose not to accept cookies, you will be unable to see the questions you ask or receive answers and the application will not work as intended.</span>
             <div>
