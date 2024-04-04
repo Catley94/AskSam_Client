@@ -148,11 +148,6 @@ const App: FC = () => {
     document.getElementById("cookieNotification")?.classList.add("hidden");
   }
   
-
-  
-
-  
-
   return (
     <>
       <div id="askSamContainer" className="text-center py-12 bg-slate-200 text-slate-600">
