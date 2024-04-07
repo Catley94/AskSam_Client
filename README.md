@@ -1,30 +1,24 @@
-# React + TypeScript + Vite
+# Ask Sam (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![alt text](./public/AskSam_Client.png)
 
-Currently, two official plugins are available:
+This front end app allows anyone to ask anonymous questions, and have them answered with the objective to teach and help cultivate new perspectives on many things in life.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Technical flow of app
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+    User loads the page
+      React checks if there is a cookie with the same of "clientId"
+        if no:
+          Displays Cookie notification
+            If User accepts cookies:
+              Sends GET request to /questions/getclientid which returns a random guid
+              Stores the guid in a cookie
+              React sends GET request to /questions/{clientid} which returns all the questions in the database with the clientId attached.
+              React populates question list.
+            If User declines cookies:
+              Check if there is an existing cookie and delete,
+                otherwise, do nothing.
+    User submits a question
+      React sends POST request to server posting the data (guid, question, answered, answer).
+      React sends GET request to /questions/{clientid} which returns all the questions in the database with the clientId attached.
+      React populates question list.
