@@ -28,6 +28,8 @@ const App: FC = () => {
       React populates question list.
   */
 
+  const AskSamAPILocation = "https://asksamapi.azurewebsites.net/questions";
+
   const cookieClientId: string = "clientId";  
 
   const header: string = "Ask Sam";
@@ -76,7 +78,7 @@ const App: FC = () => {
       console.error("Unable to POST question as cookies were declined, thus there is no unique id for this user.");
       return null;
     }
-    const response = await fetch(`http://localhost:5125/questions/${Cookies.get(cookieClientId)}`, {
+    const response = await fetch(`${AskSamAPILocation}/${Cookies.get(cookieClientId)}`, {
       method: "GET"
     })
     await response.json()
@@ -98,7 +100,7 @@ const App: FC = () => {
       type: "General"
     }
     
-    postDataToAPI("http://localhost:5125/questions", data)
+    postDataToAPI(`${AskSamAPILocation}`, data)
       .then(() => {
         populateQuestionsFromAPI(); //Populates the question list
         setCurrentQuestion(""); //Resets TextArea to empty
@@ -144,7 +146,7 @@ const App: FC = () => {
   }
 
   const fetchUserIdAndPopulateQuestions = async (): Promise<void> => {
-    const response = await fetch(`http://localhost:5125/questions/getclientid`, {
+    const response = await fetch(`${AskSamAPILocation}/getclientid`, {
       method: "GET"
     })
     const data = await response.json();
