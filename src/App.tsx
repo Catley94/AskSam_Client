@@ -45,6 +45,8 @@ const App: FC = () => {
   const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(process.env.NODE_ENV);
+    console.log(process.env);
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
       //Cookie does not exist
