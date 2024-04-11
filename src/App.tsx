@@ -49,6 +49,7 @@ const App: FC = () => {
     console.log(process.env.NODE_ENV);
     console.log(process.env.REACT_APP_TEST_KEY);
     console.log(process.env.Test_Key);
+    //Testing 
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
       //Cookie does not exist
