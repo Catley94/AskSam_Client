@@ -45,8 +45,9 @@ const App: FC = () => {
   const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
+    // console.log(Netlify.env.get("MY_IMPORTANT_VARIABLE"));
     console.log(process.env.NODE_ENV);
-    console.log(process.env);
+    console.log(process.env.REACT_APP_TEST_KEY);
     console.log(process.env.Test_Key);
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
