@@ -47,6 +47,7 @@ const App: FC = () => {
   useEffect(() => {
     console.log(process.env.NODE_ENV);
     console.log(process.env);
+    console.log(process.env.Test_Key);
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
       //Cookie does not exist
