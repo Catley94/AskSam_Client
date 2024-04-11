@@ -32,6 +32,8 @@ const App: FC = () => {
 
   const cookieClientId: string = "clientId";  
 
+  const msToCheckForAnswers = 10000;
+
   const header: string = "Ask Sam";
   
   const shiftKeyCode: number = 16;
@@ -49,6 +51,11 @@ const App: FC = () => {
       showCookieNotification(true);
     } else {
       populateQuestionsFromAPI();
+
+      setInterval(() => {
+        populateQuestionsFromAPI();
+      }, msToCheckForAnswers);
+
     }
   }, []); // The empty array ensures this effect runs only on initial render
 
@@ -64,6 +71,7 @@ const App: FC = () => {
 
     await fetchAllQuestions()
       .then((questions) => {
+        document.getElementById("loading_questions")?.classList.add("hidden");
         setQuestions(questions?.reverse());
       })
       .catch((error) => {
@@ -197,6 +205,7 @@ const App: FC = () => {
           <div>
               <h1 className="font-semibold text-2xl p-3">Question History</h1>
               <ul className="bg-white shadow-md rounded-xl mx-auto max-w-lg">
+                <span id="loading_questions" className="m-2 loading loading-dots loading-lg"></span>
                 {questions !== undefined && questions?.map((question, i) => <Question {...question} key={i} />)}
               </ul>
           </div>
