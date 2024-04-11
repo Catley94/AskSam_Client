@@ -32,6 +32,8 @@ const App: FC = () => {
 
   const cookieClientId: string = "clientId";  
 
+  const API_KEY = process.env.REACT_APP_TEST_KEY;
+
   const msToCheckForAnswers = 10000;
 
   const header: string = "Ask Sam";
@@ -49,6 +51,7 @@ const App: FC = () => {
     console.log(process.env.NODE_ENV);
     console.log(process.env.REACT_APP_TEST_KEY);
     console.log(process.env.Test_Key);
+    console.log(API_KEY);
     //Testing 
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
