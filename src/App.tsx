@@ -29,10 +29,9 @@ const App: FC = () => {
   */
 
   const AskSamAPILocation = "https://asksamapi.azurewebsites.net/questions";
+  // const AskSamAPILocation = "http://localhost:5125/questions";
 
   const cookieClientId: string = "clientId";  
-
-  const API_KEY = process.env.REACT_APP_TEST_KEY;
 
   const msToCheckForAnswers = 10000;
 
@@ -47,12 +46,7 @@ const App: FC = () => {
   const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
-    // console.log(Netlify.env.get("MY_IMPORTANT_VARIABLE"));
-    console.log(process.env.NODE_ENV);
-    console.log(process.env.REACT_APP_TEST_KEY);
-    console.log(process.env.Test_Key);
-    console.log(API_KEY);
-    //Testing 
+  
     const clientIdCookie = Cookies.get(cookieClientId);
     if(!clientIdCookie) {
       //Cookie does not exist
@@ -97,13 +91,19 @@ const App: FC = () => {
     const response = await fetch(`${AskSamAPILocation}/${Cookies.get(cookieClientId)}`, {
       method: "GET"
     })
-    await response.json()
-    .then((_questions) => {
-      _questionList = _questions;
-    })
-    .catch((error) => {
-      console.error("Error fetching question list: ", error);
-    })
+    try {
+      await response.json()
+      .then((_questions) => {
+        _questionList = _questions;
+      })
+      .catch((error) => {
+        // console.error("Error fetching question list: ", error);
+        throw Error(error);
+      })
+    }
+    catch(error) {
+      console.log(error);
+    }
     return _questionList;
   }
 
