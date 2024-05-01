@@ -120,9 +120,6 @@ const App: FC = () => {
       .then(() => {
 
       })
-      .catch((error) => {
-        
-      })
       .finally(() => {
         populateQuestionsFromAPI();
         setCurrentQuestion(""); //Resets TextArea to empty
