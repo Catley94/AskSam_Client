@@ -5,6 +5,7 @@ interface QuestionObj {
     answer: string,
     dateCreated: string,
     dateUpdated: string
+    onDelete: (questionId: number) => Promise<void>
 }
 
 export default QuestionObj;

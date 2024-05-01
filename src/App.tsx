@@ -3,6 +3,7 @@ import './App.css'
 import Question from './Components/Question';
 import QuestionObj from './Interface/QuestionObj';
 import Cookies from "js-cookie";
+import { error } from 'console';
 // import QuestionObj from './Interface/QuestionObj';
 
 const App: FC = () => {
@@ -118,14 +119,30 @@ const App: FC = () => {
     
     postDataToAPI(`${AskSamAPILocation}`, data)
       .then(() => {
-        populateQuestionsFromAPI(); //Populates the question list
+
+      })
+      .catch((error) => {
+        
+      })
+      .finally(() => {
+        populateQuestionsFromAPI();
         setCurrentQuestion(""); //Resets TextArea to empty
-      });
+      })
   }
 
-  const postDataToAPI = async (url = "", data = {}): Promise<object> => {
+  const postDataToAPI = async (url: string, data: object = {}): Promise<object> => {
+    return toAPI("POST", url, data);
+  }
+
+  const deleteDataToAPI = async (url: string, data: object = {}): Promise<object> => {
+    return toAPI("DELETE", url, data);
+  }
+
+  
+
+  const toAPI = async (method: string, url: string, data: object): Promise<object> => {
     const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      method: method, // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
@@ -137,7 +154,7 @@ const App: FC = () => {
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify(data), // body data type must match "Content-Type" header
     });
-    return response.json(); // parses JSON response into native JavaScript objects
+    return response?.json(); // parses JSON response into native JavaScript objects
   }
 
   const onHandleKeyDown = (event: { keyCode: number; }): void => {
@@ -174,6 +191,20 @@ const App: FC = () => {
 
   const createCookie = (cookieName: string, data: string, days: number) => {
     Cookies.set(cookieName, data, { expires: days });
+  }
+
+  const onQuestionDelete = async (questionId: number): Promise<void> => {
+    deleteDataToAPI(`${AskSamAPILocation}/${questionId}`)
+      .then(() => {
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        populateQuestionsFromAPI();
+      })
+    
   }
 
   return (
@@ -214,7 +245,7 @@ const App: FC = () => {
               <h1 className="font-semibold text-2xl p-3">Question History</h1>
               <ul className="bg-white shadow-md rounded-xl mx-auto max-w-lg">
                 <span id="loading_questions" className="m-2 loading loading-dots loading-lg"></span>
-                {questions !== undefined && questions?.map((question, i) => <Question {...question} key={i} />)}
+                {questions !== undefined && questions?.map((question, i) => <Question {...question} onDelete={onQuestionDelete} key={i} />)}
               </ul>
           </div>
           
