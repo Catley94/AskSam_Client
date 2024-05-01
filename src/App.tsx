@@ -3,7 +3,6 @@ import './App.css'
 import Question from './Components/Question';
 import QuestionObj from './Interface/QuestionObj';
 import Cookies from "js-cookie";
-import { error } from 'console';
 // import QuestionObj from './Interface/QuestionObj';
 
 const App: FC = () => {
@@ -196,7 +195,7 @@ const App: FC = () => {
   const onQuestionDelete = async (questionId: number): Promise<void> => {
     deleteDataToAPI(`${AskSamAPILocation}/${questionId}`)
       .then(() => {
-        
+
       })
       .catch((error) => {
         console.error(error);
