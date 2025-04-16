@@ -28,8 +28,8 @@ const App: FC = () => {
       React populates question list.
   */
 
-  const AskSamAPILocation = "https://asksamapi.azurewebsites.net/questions";
-  // const AskSamAPILocation = "http://localhost:5125/questions";
+  // const AskSamAPILocation = "https://asksamapi.azurewebsites.net/questions";
+  const AskSamAPILocation = "http://localhost:5125/questions";
 
   const cookieClientId: string = "clientId";  
 
