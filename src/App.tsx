@@ -29,7 +29,7 @@ const App: FC = () => {
   */
 
   // const AskSamAPILocation = "https://asksamapi.azurewebsites.net/questions";
-  const AskSamAPILocation = "http://localhost:5125/questions";
+  const AskSamAPILocation = "http://raspberrypi:5125/questions";
 
   const cookieClientId: string = "clientId";  
 
