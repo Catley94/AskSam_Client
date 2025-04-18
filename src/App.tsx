@@ -37,12 +37,12 @@ const App: FC = () => {
 
   const header: string = "Ask Sam";
   
-  const shiftKeyCode: number = 16;
+  const controlKeyCode: number = 17;
   const enterKeyCode: number = 13;
 
   const [questions, setQuestions]: [QuestionObj[] | undefined, Dispatch<QuestionObj[] | undefined>] = useState<QuestionObj[]>();
   const [currentQuestion, setCurrentQuestion]: [string | number | readonly string[] | undefined, Dispatch<string | number | readonly string[] | undefined>] = useState<string | number | readonly string[] | undefined>("");
-  const [shiftKeyHeldDown, setShiftKeyHeldDown]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
+  const [controlKeyHeldDown, setControlKeyHeldDown]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
   const [cookiesDeclined, setCookiesDeclined]: [boolean, Dispatch<boolean>] = useState<boolean>(false);
 
   useEffect(() => {
@@ -154,12 +154,12 @@ const App: FC = () => {
   }
 
   const onHandleKeyDown = (event: { keyCode: number; }): void => {
-    if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(true);
-    if(shiftKeyHeldDown && event.keyCode === enterKeyCode) submitQuestion();
+    if(event.keyCode === controlKeyCode) setControlKeyHeldDown(true);
+    if(controlKeyHeldDown && event.keyCode === enterKeyCode) submitQuestion();
   }
 
   const onHandleKeyUp = (event: { keyCode: number; }): void => {
-    if(event.keyCode === shiftKeyCode) setShiftKeyHeldDown(false); 
+    if(event.keyCode === controlKeyCode) setControlKeyHeldDown(false);
   }
 
   const onAcceptCookies = () => {
@@ -236,7 +236,7 @@ const App: FC = () => {
                       >Submit</button>
               </div>    
           </div>
-          <span className="text-gray-400 italic">Desktop: Shift + Enter to Submit</span>
+          <span className="text-gray-400 italic">Desktop: Control + Enter to Submit</span>
           <div>
               <h1 className="font-semibold text-2xl p-3">Question History</h1>
               <ul className="bg-white shadow-md rounded-xl mx-auto max-w-lg">
